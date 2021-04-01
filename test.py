@@ -13,5 +13,4 @@ try:
   model.summary()
 except Exception as e:
   print(str(e))
-  print("e.StackTrace"+e.StackTrace)
   
