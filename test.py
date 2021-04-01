@@ -15,5 +15,4 @@ try:
     model.summary()
 except Exception as e:
   print(str(e))
-  print(e.__traceback__.tb_frame.f_globals["__file__"])
-  print(e.__traceback__.tb_lineno)
+  
