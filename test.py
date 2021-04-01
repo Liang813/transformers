@@ -13,4 +13,7 @@ try:
   model.summary()
 except Exception as e:
   print(str(e))
+  print("e.Message"+e.Message)
+  print("e.Source"+e.Source)
+  print("e.StackTrace"+e.StackTrace)
   
