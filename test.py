@@ -1,7 +1,6 @@
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense
 from tensorflow.python.keras.models import Model
-import tsensor
 from transformers import TFBertModel
 try:
   input_layer = Input(shape = (512,), dtype='int64')
@@ -11,8 +10,7 @@ try:
   flat = Flatten()(dropout)
   classifier = Dense(units=5)(flat)
   model = Model(inputs=input_layer, outputs=classifier)
-  with tsensor.clarify():
-    model.summary()
+  model.summary()
 except Exception as e:
   print(str(e))
   
