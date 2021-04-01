@@ -695,7 +695,7 @@ class TFAlbertModel(TFAlbertPreTrainedModel):
             # add hidden_states and attentions if they are here
             outputs = (sequence_output, pooled_output,) + encoder_outputs[1:]
             # sequence_output, pooled_output, (hidden_states), (attentions)
-        return outputs
+            return outputs
     except Exception as e:
         print(e.__traceback__.tb_frame.f_globals["__file__"])
         print(e.__traceback__.tb_lineno)
