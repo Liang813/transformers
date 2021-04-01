@@ -568,63 +568,62 @@ ALBERT_INPUTS_DOCSTRING = r"""
 @add_start_docstrings("The bare Albert Model transformer outputing raw hidden-states without any specific head on top.",
                       ALBERT_START_DOCSTRING, ALBERT_INPUTS_DOCSTRING)
 class TFAlbertModel(TFAlbertPreTrainedModel):
-    try:
-        r"""
-        Outputs: `Tuple` comprising various elements depending on the configuration (config) and inputs:
-            **last_hidden_state**: ``tf.Tensor`` of shape ``(batch_size, sequence_length, hidden_size)``
-                Sequence of hidden-states at the output of the last layer of the model.
-            **pooler_output**: ``tf.Tensor`` of shape ``(batch_size, hidden_size)``
-                Last layer hidden-state of the first token of the sequence (classification token)
-                further processed by a Linear layer and a Tanh activation function. The Linear
-                layer weights are trained from the next sentence prediction (classification)
-                objective during Albert pretraining. This output is usually *not* a good summary
-                of the semantic content of the input, you're often better with averaging or pooling
-                the sequence of hidden-states for the whole input sequence.
-            **hidden_states**: (`optional`, returned when ``config.output_hidden_states=True``)
-                list of ``tf.Tensor`` (one for the output of each layer + the output of the embeddings)
-                of shape ``(batch_size, sequence_length, hidden_size)``:
-                Hidden-states of the model at the output of each layer plus the initial embedding outputs.
-            **attentions**: (`optional`, returned when ``config.output_attentions=True``)
-                list of ``tf.Tensor`` (one for each layer) of shape ``(batch_size, num_heads, sequence_length, sequence_length)``:
-                Attentions weights after the attention softmax, used to compute the weighted average in the self-attention heads.
+    r"""
+    Outputs: `Tuple` comprising various elements depending on the configuration (config) and inputs:
+        **last_hidden_state**: ``tf.Tensor`` of shape ``(batch_size, sequence_length, hidden_size)``
+            Sequence of hidden-states at the output of the last layer of the model.
+        **pooler_output**: ``tf.Tensor`` of shape ``(batch_size, hidden_size)``
+            Last layer hidden-state of the first token of the sequence (classification token)
+            further processed by a Linear layer and a Tanh activation function. The Linear
+            layer weights are trained from the next sentence prediction (classification)
+            objective during Albert pretraining. This output is usually *not* a good summary
+            of the semantic content of the input, you're often better with averaging or pooling
+            the sequence of hidden-states for the whole input sequence.
+        **hidden_states**: (`optional`, returned when ``config.output_hidden_states=True``)
+            list of ``tf.Tensor`` (one for the output of each layer + the output of the embeddings)
+            of shape ``(batch_size, sequence_length, hidden_size)``:
+            Hidden-states of the model at the output of each layer plus the initial embedding outputs.
+        **attentions**: (`optional`, returned when ``config.output_attentions=True``)
+            list of ``tf.Tensor`` (one for each layer) of shape ``(batch_size, num_heads, sequence_length, sequence_length)``:
+            Attentions weights after the attention softmax, used to compute the weighted average in the self-attention heads.
 
-        Examples::
+    Examples::
 
-            import tensorflow as tf
-            from transformers import AlbertTokenizer, TFAlbertModel
+        import tensorflow as tf
+        from transformers import AlbertTokenizer, TFAlbertModel
 
-            tokenizer = AlbertTokenizer.from_pretrained('bert-base-uncased')
-            model = TFAlbertModel.from_pretrained('bert-base-uncased')
-            input_ids = tf.constant(tokenizer.encode("Hello, my dog is cute"))[None, :]  # Batch size 1
-            outputs = model(input_ids)
-            last_hidden_states = outputs[0]  # The last hidden-state is the first element of the output tuple
+        tokenizer = AlbertTokenizer.from_pretrained('bert-base-uncased')
+        model = TFAlbertModel.from_pretrained('bert-base-uncased')
+        input_ids = tf.constant(tokenizer.encode("Hello, my dog is cute"))[None, :]  # Batch size 1
+        outputs = model(input_ids)
+        last_hidden_states = outputs[0]  # The last hidden-state is the first element of the output tuple
 
+    """
+
+    def __init__(self, config, **kwargs):
+        super(TFAlbertModel, self).__init__(config, **kwargs)
+        self.num_hidden_layers = config.num_hidden_layers
+
+        self.embeddings = TFAlbertEmbeddings(config, name="embeddings")
+        self.encoder = TFAlbertTransformer(config, name="encoder")
+        self.pooler = tf.keras.layers.Dense(config.hidden_size, kernel_initializer=get_initializer(
+            config.initializer_range), activation='tanh', name='pooler')
+
+    def get_input_embeddings(self):
+        return self.embeddings
+
+    def _resize_token_embeddings(self, new_num_tokens):
+        raise NotImplementedError
+
+    def _prune_heads(self, heads_to_prune):
+        """ Prunes heads of the model.
+            heads_to_prune: dict of {layer_num: list of heads to prune in this layer}
+            See base class PreTrainedModel
         """
+        raise NotImplementedError
 
-        def __init__(self, config, **kwargs):
-            super(TFAlbertModel, self).__init__(config, **kwargs)
-            self.num_hidden_layers = config.num_hidden_layers
-
-            self.embeddings = TFAlbertEmbeddings(config, name="embeddings")
-            self.encoder = TFAlbertTransformer(config, name="encoder")
-            self.pooler = tf.keras.layers.Dense(config.hidden_size, kernel_initializer=get_initializer(
-                config.initializer_range), activation='tanh', name='pooler')
-
-        def get_input_embeddings(self):
-            return self.embeddings
-
-        def _resize_token_embeddings(self, new_num_tokens):
-            raise NotImplementedError
-
-        def _prune_heads(self, heads_to_prune):
-            """ Prunes heads of the model.
-                heads_to_prune: dict of {layer_num: list of heads to prune in this layer}
-                See base class PreTrainedModel
-            """
-            raise NotImplementedError
-
-        def call(self, inputs, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, inputs_embeds=None, training=False):
-
+    def call(self, inputs, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, inputs_embeds=None, training=False):
+        try:
             if isinstance(inputs, (tuple, list)):
                 input_ids = inputs[0]
                 attention_mask = inputs[1] if len(inputs) > 1 else attention_mask
@@ -695,11 +694,10 @@ class TFAlbertModel(TFAlbertPreTrainedModel):
             # add hidden_states and attentions if they are here
             outputs = (sequence_output, pooled_output,) + encoder_outputs[1:]
             # sequence_output, pooled_output, (hidden_states), (attentions)
-            return outputs
-    except Exception as e:
-        print(e.__traceback__.tb_frame.f_globals["__file__"])
-        print(e.__traceback__.tb_lineno)
-
+        except Exception as e:
+            print(e.__traceback__.tb_frame.f_globals["__file__"])
+            print(e.__traceback__.tb_lineno)
+        return outputs
 
 @add_start_docstrings("""Albert Model with a `language modeling` head on top. """,
                       ALBERT_START_DOCSTRING, ALBERT_INPUTS_DOCSTRING)
