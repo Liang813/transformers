@@ -623,26 +623,26 @@ class TFAlbertModel(TFAlbertPreTrainedModel):
         raise NotImplementedError
 
     def call(self, inputs, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, inputs_embeds=None, training=False):
-        try：
-            if isinstance(inputs, (tuple, list)):
-                input_ids = inputs[0]
-                attention_mask = inputs[1] if len(inputs) > 1 else attention_mask
-                token_type_ids = inputs[2] if len(inputs) > 2 else token_type_ids
-                position_ids = inputs[3] if len(inputs) > 3 else position_ids
-                head_mask = inputs[4] if len(inputs) > 4 else head_mask
-                inputs_embeds = inputs[5] if len(inputs) > 5 else inputs_embeds
-                assert len(inputs) <= 6, "Too many inputs."
-            elif isinstance(inputs, dict):
-                input_ids = inputs.get('input_ids')
-                attention_mask = inputs.get('attention_mask', attention_mask)
-                token_type_ids = inputs.get('token_type_ids', token_type_ids)
-                position_ids = inputs.get('position_ids', position_ids)
-                head_mask = inputs.get('head_mask', head_mask)
-                inputs_embeds = inputs.get('inputs_embeds', inputs_embeds)
-                assert len(inputs) <= 6, "Too many inputs."
-            else:
-                input_ids = inputs
-
+        
+        if isinstance(inputs, (tuple, list)):
+            input_ids = inputs[0]
+            attention_mask = inputs[1] if len(inputs) > 1 else attention_mask
+            token_type_ids = inputs[2] if len(inputs) > 2 else token_type_ids
+            position_ids = inputs[3] if len(inputs) > 3 else position_ids
+            head_mask = inputs[4] if len(inputs) > 4 else head_mask
+            inputs_embeds = inputs[5] if len(inputs) > 5 else inputs_embeds
+            assert len(inputs) <= 6, "Too many inputs."
+        elif isinstance(inputs, dict):
+            input_ids = inputs.get('input_ids')
+            attention_mask = inputs.get('attention_mask', attention_mask)
+            token_type_ids = inputs.get('token_type_ids', token_type_ids)
+            position_ids = inputs.get('position_ids', position_ids)
+            head_mask = inputs.get('head_mask', head_mask)
+            inputs_embeds = inputs.get('inputs_embeds', inputs_embeds)
+            assert len(inputs) <= 6, "Too many inputs."
+        else:
+            input_ids = inputs
+        try:
             if input_ids is not None and inputs_embeds is not None:
                 raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
             elif input_ids is not None:
