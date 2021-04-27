@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 
 import tensorflow as tf
 
-from transformers import ElectraConfig
+from src.transformers import ElectraConfig
 
 from .file_utils import (
     MULTIPLE_CHOICE_DUMMY_INPUTS,
