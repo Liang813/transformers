@@ -10,4 +10,4 @@ try:
   input = tf.random.uniform(shape=[1,25], maxval=100, dtype=tf.int32)
   hist = model.fit(input, input, epochs=1, steps_per_epoch=1,verbose=0)
 except Exception as e:
-  traceback.print_exc(file=open('transformers6560-buggy.txt','w+'))
+  traceback.print_exc(file=open('/script/transformers6560-buggy.txt','w+'))
