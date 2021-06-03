@@ -19,7 +19,7 @@ import argparse
 import logging
 import os
 
-from transformers import (
+from src.transformers import (
     ALBERT_PRETRAINED_CONFIG_ARCHIVE_MAP,
     BERT_PRETRAINED_CONFIG_ARCHIVE_MAP,
     CAMEMBERT_PRETRAINED_CONFIG_ARCHIVE_MAP,
@@ -78,7 +78,7 @@ from transformers import (
 if is_torch_available():
     import torch
     import numpy as np
-    from transformers import (
+    from src.transformers import (
         BertForPreTraining,
         BertForQuestionAnswering,
         BertForSequenceClassification,
