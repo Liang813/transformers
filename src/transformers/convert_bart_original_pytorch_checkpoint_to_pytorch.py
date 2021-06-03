@@ -24,14 +24,14 @@ import fairseq
 import torch
 from packaging import version
 
-from transformers import (
+from src.transformers import (
     BartConfig,
     BartForConditionalGeneration,
     BartForSequenceClassification,
     BartModel,
     BartTokenizer,
 )
-from transformers.modeling_bart import _make_linear_from_emb
+from src.transformers.modeling_bart import _make_linear_from_emb
 
 
 FAIRSEQ_MODELS = ["bart.large", "bart.large.mnli", "bart.large.cnn", "bart_xsum/model.pt"]
