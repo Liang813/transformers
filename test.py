@@ -1,5 +1,5 @@
 import torch
-from transformers import TransfoXLConfig, TransfoXLLMHeadModel
+from src.transformers import TransfoXLConfig, TransfoXLLMHeadModel
 
 config = TransfoXLConfig()
 lm = TransfoXLLMHeadModel(config)
