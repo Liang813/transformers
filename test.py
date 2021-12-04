@@ -13,5 +13,5 @@ try:
   model = Model(inputs=input_layer, outputs=classifier)
   model.summary()
 except Exception as e:
-  traceback.print_exc(file=open('/script/transformers1962-buggy.txt','w+'))
+  traceback.print_exc()
   
